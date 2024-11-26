@@ -1,81 +1,70 @@
-local Hooks = { };
-local Hooks_mt = { 
-    __index = Hooks;
-    __call = function(self, ...)
-        local args = {...};
-        if args[1] then
-            if typeof(args[1]) ~= "table" then 
-                return Hooks:error("[Hooks:new()] [argument #1] must be table or metatable") 
-            end
-            return self:new(args[1]);
+local ArrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/ArrayField/main/Source.lua'))()
+
+        local Window = ArrayField:CreateWindow({
+            Name = "OSS Hub x Midnight.cc Skin Changer",
+            LoadingTitle = "OSS Hub Best Script Hub",
+            LoadingSubtitle = "Made By Laera x Primelus",
+            ConfigurationSaving = {
+                Enabled = false,
+                FolderName = nil,
+                FileName = "ArrayField"
+            },
+            Discord = {
+                Enabled = true,
+                Invite = "osshub",
+                RememberJoins = true
+            },
+            KeySystem = false,
+            KeySettings = {
+                Title = "Untitled",
+                Subtitle = "Key System",
+                Note = "No method of obtaining the key is provided",
+                FileName = "Key",
+                SaveKey = true,
+                GrabKeyFromSite = false,
+                Key = {"Hello"}
+            }
+        })
+
+        local SkinsTab = Window:CreateTab("Skins", 4483362458)
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local SkinsDropdown = SkinsTab:CreateDropdown({
+            Name = "Skin Changer",
+            Options = {},
+            CurrentOption = "Select Skin",
+            MultiSelection = false,
+            Flag = "Skin",
+            Callback = function(Option)
+                LocalPlayer.CharacterAppearance = Option
+            end,
+        })
+
+        for _, skin in ipairs(game:GetService("ReplicatedStorage").Skins:GetChildren()) do
+            SkinsDropdown:Add(skin.Name)
         end
-        return nil;
-    end
-};
 
-function Hooks:error(message)
-    local date = os.date("!*t");
-    function n(number)
-        return (number > 9 and tostring(number) or ("0%s"):format(number));
-    end
-    local fTime = ("%s:%s:%s"):format(n(date.hour), n(date.min), n(date.sec));
-	return warn(("[%s] [Hooks] %s"):format(fTime, message));
-end
+        local KnifeDropdown = SkinsTab:CreateDropdown({
+            Name = "Knife Changer",
+            Options = {},
+            CurrentOption = "Select Knife",
+            MultiSelection = false,
+            Flag = "KnifeSkin",
+            Callback = function(Option)
+                LocalPlayer.Character.Melee.Value = Option
+            end,
+        })
 
-function Hooks:new(base)
-	if typeof(base) ~= "table" then 
-        return Hooks:error("[Hooks:new()] [argument #1] must be table or metatable") 
-    end
-	local hooks = setmetatable({ 
-        __base = base; 
-        __old = {};
-    }, Hooks_mt);
-	for i, v in pairs(base) do
-		if typeof(v) == "function" then
-			local name = debug.getinfo(v).name:lower():gsub("%s+", "");
-			hooks.__old[string.len(name) > 0 and name or i] = v;
-		end
-	end
-	return hooks;
-end
+        for _, melee in ipairs(game:GetService("ReplicatedStorage").ItemData.Images.Melees:GetChildren()) do
+            KnifeDropdown:Add(melee.Name)
+        end
 
-function Hooks:getTable(value, multi)
-    if typeof(value) ~= "string" then 
-        return Hooks:error("[Hooks:getTable()] [argument #1] must be string") 
-    end
-    local tab = {};
-    for _, v in next, getgc(true) do
-        if type(v) == "table" and rawget(v, value) then
-            if multi then
-                table.insert(tab, v);
-            else
-                tab = v;
-            end
-	    end
-    end
-    return tab;
-end
+        SkinsTab:CreateLabel("Some knife skins need specific game modes so you can't use them")
 
-function Hooks:getOriginal(func)
-	if typeof(func) ~= "string" then return 
-        Hooks:error("[Hooks:getOriginal()] [argument #1] must be string") 
-    end
-    return (self.__old[func:lower()] or self.__old[func] or nil);
-end
+        local Section = SkinsTab:CreateSection("Destroy GUI")
 
-function Hooks:Hook(func, hookfunc)
-	if typeof(func) ~= "string" then return 
-        Hooks:error("[Hooks:Hook()] [argument #1] must be string") 
-    end
-	if typeof(hookfunc) ~= "function" then 
-        return Hooks:error("[Hooks:Hook()] [argument #2] must be function") 
-    end
-	local readonly = isreadonly(self.__base);
-	if readonly then 
-        setreadonly(self.__base, false) 
-    end
-    self.__base[func] = newcclosure(hookfunc);
-	setreadonly(self.__base, readonly)
-end
-
-return Hooks;
+        SkinsTab:CreateButton({
+            Name = "Destroy GUI",
+            Callback = function()
+                ArrayField:Destroy()
+            end,
+        })
